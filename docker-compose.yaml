@@ -12,3 +12,14 @@ services:
       - './frontend/src:/srv/src'
     ports:
       - '3000:3000'
+
+  backend:
+    labels:
+      shipyard.route: '/api'
+    build: 'backend'
+    environment:
+      OPEN_LEGISLATION_KEY: ${OPEN_LEGISLATION_KEY}
+    volumes:
+      - './backend/src:/srv/src'
+    ports:
+      - '3001:3001'
