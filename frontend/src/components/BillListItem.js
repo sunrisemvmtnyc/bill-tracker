@@ -10,38 +10,58 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { Sigma, RandomizeNodePositions, RelativeSize } from 'react-sigma';
 
+import Link from '@material-ui/core/Link';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+
 const useStyles = makeStyles({
   root: {
     margin: "10px",
     width: "1000px"
   },
-  media: {
-    height: 140,
+
+  none: {},
+  greenBG: {
+    background: 'green',
+    border: '10px solid white',
+    borderRadius: '30px'
   },
+
+  media: { height: 140, },
+
+  billName: {
+    fontSize: '1.2rem',
+    width: '100px'
+  }
 });
 
-let myGraph = {
-  nodes: [
-    {id: "n1", label: "Introduced"},
-    {id: "n2", label: "In Committee"},
-    {id: "n3", label: "On Floor Calendar"},
-    {id: "n4", label: "Passed Senate"},
-    {id: "n5", label: "Passed Assembly"},
-    {id: "n6", label: "Delivered to Governor"},
-    {id: "n7", label: "Signed by Governor"}
-  ],
-  edges: [
-    {id: "e1", source: "n1", target: "n2", label: ""},
-    {id: "e2", source: "n2", target: "n3", label: ""},
-    {id: "e3", source: "n3", target: "n4", label: ""},
-    {id: "e4", source: "n3", target: "n5", label: ""},
-    {id: "e5", source: "n4", target: "n6", label: ""},
-    {id: "e6", source: "n5", target: "n6", label: ""},
-    {id: "e7", source: "n6", target: "n7", label: ""},
-  ]};
+
+function stepCompleted(billData, step) {
+  const completedSteps = {
+    'IN_SENATE_COMM': ['In Committee'],
+    'SENATE_FLOOR': ['In Committee', 'On Floor Calendar'],
+    'PASSED_SENATE': ['In Committee', 'On Floor Calendar', 'Passed Senate'],
+
+    'IN_ASSEMBLY_COMM': ['In Committee'],
+    'ASSEMBLY_FLOOR': ['In Committee', 'On Floor Calendar'],
+    'PASSED_ASSEMBLY': ['In Committee', 'On Floor Calendar', 'Passed Assembly'],
+
+    'DELIVERED_TO_GOV': ['In Committee', 'On Floor Calendar', 'Passed Senate', 'Passed Assembly', 'Delivered to Governor'],
+    'SIGNED_BY_GOV': ['In Committee', 'On Floor Calendar', 'Passed Senate', 'Passed Assembly', 'Delivered to Governor', 'Signed by Governor'],
+    'VETOED': ['In Committee', 'On Floor Calendar', 'Passed Senate', 'Passed Assembly', 'Delivered to Governor', 'Vetoed'],
+  }[billData.status.statusType] || [];
+
+  console.log('debug', completedSteps.includes(step));
+  return completedSteps.includes(step);
+}
 
 export default function BillListItem(props) {
-  const classes = useStyles();
+  const c = useStyles();
   const [billData, setBillData] = useState(null);
 
   useEffect(() => {
@@ -59,52 +79,30 @@ export default function BillListItem(props) {
     return "";
   }
 
-  let billCode;
-  if (billData && billData.billType.chamber === 'SENATE') {
-    billCode = `Senate Bill ${billData.printNo}`;
+  // Prepare the full bill name
+  let fullBillName;
+  if (billData.billType.chamber === 'SENATE') {
+    fullBillName = `Senate Bill ${billData.printNo}`;
   } else {
-    billCode = `Assembly Bill ${billData.printNo}`;
+    fullBillName = `Assembly Bill ${billData.printNo}`;
   }
 
+  let billURL = `https://www.nysenate.gov/legislation/bills/${billData.session}/${billData.printNo}`;
+
   return (
-    <Card className={classes.root}>
-      <CardActionArea>
-        <CardContent>
-          <Box display="flex">
-            <Box>
-              <Typography gutterBottom align="left" variant="h4">
-                {billCode}
-              </Typography>
-
-              <Typography gutterBottom align="left" variant="h6">
-                {billData.title}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography gutterBottom align="right" variant="h6">
-                {billData.status.statusDesc}
-              </Typography>
-              <Box border={1} m={4}>
-                <Sigma style={{position: 'relative', width:"600px", height:"200px"}}
-                  graph={myGraph}
-                  settings={{drawEdges: true, clone: false}}>
-                  <RelativeSize initialSize={15}/>
-                  <RandomizeNodePositions/>
-                </Sigma>
-              </Box>
-            </Box>
-          </Box>
-
-        </CardContent>
-      </CardActionArea>
-
-      {false &&
-      <CardActions>
-        <Button size="small" color="primary">
-          See Votes
-        </Button>
-      </CardActions>
-      }
-    </Card>
+    <TableRow key={billData.printNo}>
+      <TableCell component="th" scope="row" colspan={2} align="center" className={c.billName}>
+        <Link target="_blank" href={billURL}>
+          {fullBillName}
+        </Link>
+      </TableCell>
+      <TableCell className={c.greenBG}></TableCell>
+      <TableCell className={stepCompleted(billData, 'In Committee') ? c.greenBG : c.none}></TableCell>
+      <TableCell className={stepCompleted(billData, 'On Floor Calendar') ? c.greenBG : c.none}></TableCell>
+      <TableCell className={stepCompleted(billData, 'Passed Senate') ? c.greenBG : c.none}></TableCell>
+      <TableCell className={stepCompleted(billData, 'Passed Assembly') ? c.greenBG : c.none}></TableCell>
+      <TableCell className={stepCompleted(billData, 'Delivered to Governor') ? c.greenBG : c.none}></TableCell>
+      <TableCell className={stepCompleted(billData, 'Signed by Governor') ? c.greenBG : c.none}></TableCell>
+    </TableRow>
   );
 }
