@@ -1,7 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
-import { palette } from '@material-ui/system';
 import Typography from '@material-ui/core/Typography';
 
 import Table from '@material-ui/core/Table';

@@ -1,23 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import { Sigma, RandomizeNodePositions, RelativeSize } from 'react-sigma';
 
 import Link from '@material-ui/core/Link';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
 
 const useStyles = makeStyles({
   root: {
@@ -29,7 +15,9 @@ const useStyles = makeStyles({
   greenBG: {
     background: 'green',
     border: '10px solid white',
-    borderRadius: '30px'
+    borderRadius: '30px',
+    fontSize: '1rem',
+    color: 'white'
   },
 
   media: { height: 140, },
@@ -66,7 +54,7 @@ export default function BillListItem(props) {
 
   useEffect(() => {
     if (!billData) {
-      let response = fetch(`/api/v1/bill/${props.year}/${props.bill}`)
+      fetch(`/api/v1/bill/${props.year}/${props.bill}`)
         .then(res => res.json())
         .then(data => {
           setBillData(data.result);
@@ -89,20 +77,26 @@ export default function BillListItem(props) {
 
   let billURL = `https://www.nysenate.gov/legislation/bills/${billData.session}/${billData.printNo}`;
 
+  const completed = (step) => stepCompleted(billData, step);
+
   return (
     <TableRow key={billData.printNo}>
       <TableCell component="th" scope="row" colspan={2} align="center" className={c.billName}>
         <Link target="_blank" href={billURL}>
           {fullBillName}
         </Link>
+        <br />
+        {billData.title}
       </TableCell>
       <TableCell className={c.greenBG}></TableCell>
-      <TableCell className={stepCompleted(billData, 'In Committee') ? c.greenBG : c.none}></TableCell>
-      <TableCell className={stepCompleted(billData, 'On Floor Calendar') ? c.greenBG : c.none}></TableCell>
-      <TableCell className={stepCompleted(billData, 'Passed Senate') ? c.greenBG : c.none}></TableCell>
-      <TableCell className={stepCompleted(billData, 'Passed Assembly') ? c.greenBG : c.none}></TableCell>
-      <TableCell className={stepCompleted(billData, 'Delivered to Governor') ? c.greenBG : c.none}></TableCell>
-      <TableCell className={stepCompleted(billData, 'Signed by Governor') ? c.greenBG : c.none}></TableCell>
+      <TableCell className={completed('In Committee') ? c.greenBG : c.none}></TableCell>
+      <TableCell className={completed('On Floor Calendar') ? c.greenBG : c.none}></TableCell>
+      <TableCell className={completed('Passed Senate') ? c.greenBG : c.none}></TableCell>
+      <TableCell className={completed('Passed Assembly') ? c.greenBG : c.none}></TableCell>
+      <TableCell className={completed('Delivered to Governor') ? c.greenBG : c.none}></TableCell>
+      <TableCell className={completed('Signed by Governor') ? c.greenBG : c.none} align="center">
+        {completed('Signed by Governor') ? `SIGNED: ${billData.status.actionDate}` : ''}
+      </TableCell>
     </TableRow>
   );
 }
