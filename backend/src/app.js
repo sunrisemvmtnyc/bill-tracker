@@ -3,15 +3,19 @@ const fetch = require('node-fetch');
 
 const host = '0.0.0.0';
 const port = 3001;
-
 const app = express();
 
-function billURL(year, printNumber) {
-  return `https://legislation.nysenate.gov/api/3/bills/${year}/${printNumber}?key=${process.env.OPEN_LEGISLATION_KEY}`
+function legAPI(path) {
+  return `https://legislation.nysenate.gov/${path}?key=${process.env.OPEN_LEGISLATION_KEY}&limit=1000`
 }
 
-app.get('/api/v1/bill/:year/:printNumber', async (req, res) => {
-  let apiResponse = await fetch(billURL(req.params.year, req.params.printNumber));
+app.get('/api/v1/bills/:year', async (req, res) => {
+  let apiResponse = await fetch(legAPI(`/api/3/bills/${req.params.year}`));
+  res.json(await apiResponse.json());
+});
+
+app.get('/api/v1/bills/:year/:printNumber', async (req, res) => {
+  let apiResponse = await fetch(legAPI(`/api/3/bills/${req.params.year}/${req.params.printNumber}`));
   res.json(await apiResponse.json());
 });
 

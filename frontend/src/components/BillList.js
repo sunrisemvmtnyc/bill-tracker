@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
@@ -23,6 +23,21 @@ const useStyles = makeStyles({
 
 export default function BillList(props) {
   const c = useStyles();
+  const [bills, setBills] = useState([]);
+
+  useEffect(() => {
+    console.log('maybe running')
+    if (bills.length === 0) {
+      console.log('running')
+      fetch(`/api/v1/bills/2019`)
+        .then(res => res.json())
+        .then(data => {
+          setBills(data.result.items);
+        });
+    }
+  });
+
+  console.log(bills);
 
   return (
     <Box display="flex"
@@ -44,7 +59,7 @@ export default function BillList(props) {
           <Table className={c.table} aria-label="simple table">
             <TableHead>
               <TableRow>
-              <TableCell align="center" className={c.tableHeader} colspan={2}></TableCell>
+              <TableCell align="center" className={c.tableHeader} colSpan={2}></TableCell>
               <TableCell align="center" className={c.tableHeader}>Introduced</TableCell>
               <TableCell align="center" className={c.tableHeader}>In Committee</TableCell>
               <TableCell align="center" className={c.tableHeader}>On Floor Calendar</TableCell>
@@ -55,8 +70,9 @@ export default function BillList(props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {props.bills.map((value, index) => {
-                return <BillListItem key={index} year={value[0]} bill={value[1]} />;
+              {bills.map((value, index) => {
+                //return <BillListItem key={index} year={value.billId.session} bill={value.billId.printNo} />;
+                return <BillListItem key={index} billData={value} />;
               })}
             </TableBody>
           </Table>

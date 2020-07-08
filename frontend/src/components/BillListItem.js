@@ -50,17 +50,19 @@ function stepCompleted(billData, step) {
 
 export default function BillListItem(props) {
   const c = useStyles();
-  const [billData, setBillData] = useState(null);
 
-  useEffect(() => {
-    if (!billData) {
-      fetch(`/api/v1/bill/${props.year}/${props.bill}`)
-        .then(res => res.json())
-        .then(data => {
-          setBillData(data.result);
-        });
-    }
-  });
+  //const [billData, setBillData] = useState(null);
+
+  //useEffect(() => {
+    //if (!billData) {
+      //fetch(`/api/v1/bills/${props.year}/${props.bill}`)
+        //.then(res => res.json())
+        //.then(data => {
+          //setBillData(data.result);
+        //});
+    //}
+  //});
+  const billData = props.billData;
 
   // Don't render anything if there is no data
   if (billData === null) {
