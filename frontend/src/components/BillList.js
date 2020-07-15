@@ -24,20 +24,24 @@ const useStyles = makeStyles({
 export default function BillList(props) {
   const c = useStyles();
   const [bills, setBills] = useState([]);
+  const [currentFilter, setFilter] = useState('SIGNED_BY_GOV')
 
   useEffect(() => {
-    console.log('maybe running')
     if (bills.length === 0) {
-      console.log('running')
       fetch(`/api/v1/bills/2019`)
         .then(res => res.json())
         .then(data => {
-          setBills(data.result.items);
+          setBills(data);
         });
     }
   });
 
-  console.log(bills);
+  // Only keep the completed bills
+  console.log(bills.length);
+
+  let filteredBills = bills.filter(x => x.status.statusType == currentFilter);
+
+  const filterByStatus = (status) => { return () => setFilter(status) };
 
   return (
     <Box display="flex"
@@ -61,16 +65,16 @@ export default function BillList(props) {
               <TableRow>
               <TableCell align="center" className={c.tableHeader} colSpan={2}></TableCell>
               <TableCell align="center" className={c.tableHeader}>Introduced</TableCell>
-              <TableCell align="center" className={c.tableHeader}>In Committee</TableCell>
-              <TableCell align="center" className={c.tableHeader}>On Floor Calendar</TableCell>
-              <TableCell align="center" className={c.tableHeader}>Passed Senate</TableCell>
-              <TableCell align="center" className={c.tableHeader}>Passed Assembly</TableCell>
-              <TableCell align="center" className={c.tableHeader}>Delivered to Governor</TableCell>
-              <TableCell align="center" className={c.tableHeader}>Signed by Governor</TableCell>
+              <TableCell align="center" className={c.tableHeader} onClick={filterByStatus('IN_SENATE_COMM')}>In Committee</TableCell>
+              <TableCell align="center" className={c.tableHeader} onClick={filterByStatus('SENATE_FLOOR')}>On Floor Calendar</TableCell>
+              <TableCell align="center" className={c.tableHeader} onClick={filterByStatus('PASSED_SENATE')}>Passed Senate</TableCell>
+              <TableCell align="center" className={c.tableHeader} onClick={filterByStatus('PASSED_ASSEMBLY')}>Passed Assembly</TableCell>
+              <TableCell align="center" className={c.tableHeader} onClick={filterByStatus('DELIVERED_TO_GOV')}>Delivered to Governor</TableCell>
+              <TableCell align="center" className={c.tableHeader} onClick={filterByStatus('SIGNED_BY_GOV')}>Signed by Governor</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {bills.map((value, index) => {
+              {filteredBills.map((value, index) => {
                 //return <BillListItem key={index} year={value.billId.session} bill={value.billId.printNo} />;
                 return <BillListItem key={index} billData={value} />;
               })}

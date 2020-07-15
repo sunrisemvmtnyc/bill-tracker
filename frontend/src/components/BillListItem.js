@@ -44,7 +44,6 @@ function stepCompleted(billData, step) {
     'VETOED': ['In Committee', 'On Floor Calendar', 'Passed Senate', 'Passed Assembly', 'Delivered to Governor', 'Vetoed'],
   }[billData.status.statusType] || [];
 
-  console.log('debug', completedSteps.includes(step));
   return completedSteps.includes(step);
 }
 
@@ -83,7 +82,7 @@ export default function BillListItem(props) {
 
   return (
     <TableRow key={billData.printNo}>
-      <TableCell component="th" scope="row" colspan={2} align="center" className={c.billName}>
+      <TableCell component="th" scope="row" colSpan={2} align="center" className={c.billName}>
         <Link target="_blank" href={billURL}>
           {fullBillName}
         </Link>
