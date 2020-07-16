@@ -1,4 +1,6 @@
 import React from 'react';
+import { createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
 
 import './App.css';
 import BillList from './components/BillList';
@@ -16,12 +18,19 @@ const BILLS =[
   ["2019", "A10608"],
 ]
 
+const THEME = createMuiTheme({
+   typography: {
+    "fontFamily": `"Fjalla One", "Roboto", "Helvetica", "Arial", sans-serif`,
+   }
+});
 
 function App() {
   return (
-    <div className="App">
-      <BillList bills={BILLS}/>
-    </div>
+    <ThemeProvider theme={THEME}>
+      <div className="App">
+        <BillList bills={BILLS}/>
+      </div>
+    </ThemeProvider>
   );
 }
 
