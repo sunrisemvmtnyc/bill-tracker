@@ -28,11 +28,17 @@ export default function BillList(props) {
 
   useEffect(() => {
     if (bills.length === 0) {
-      fetch(`/api/v1/bills/2019`)
-        .then(res => res.json())
-        .then(data => {
-          setBills(data);
-        });
+
+      const paginateBills = async() => {
+        let start = 0
+        do {
+          const res = await fetch(`/api/v1/bills/2019?start=${start}`);
+          const {bills, end} = await res.json();
+          await setBills((prevBills) => [...prevBills].concat(bills));
+          start = end
+        } while (start > 0)
+      }
+      paginateBills()
     }
   });
 

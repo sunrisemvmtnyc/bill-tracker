@@ -18,6 +18,7 @@ const redisSetEx = promisify(redisClient.setex).bind(redisClient);
 
 // Global constants
 const REDIS_CACHE_TIME = 600; // NOTE: redis counts seconds, NOT milliseconds
+const BILL_PAGE_SIZE = 3000;
 
 // Format the URL with the key and given offset
 function legAPI(path, offset = '0') {
@@ -61,9 +62,16 @@ const getBillsWithCache = async(year) => {
 // Endpoint to get all the bills in a year
 app.get('/api/v1/bills/:year', async (req, res) => {
   let bills = await getBillsWithCache(req.params.year);
-  res.json(bills);
 
-  
+  let start = 0;
+  if (parseInt(req.query.start)) start = parseInt(req.query.start);
+
+  const slicedBills = bills.slice(start, start + BILL_PAGE_SIZE);
+
+  res.json({
+    end: start + BILL_PAGE_SIZE < bills.length ? start + BILL_PAGE_SIZE : 0,
+    bills: slicedBills,
+  });
 });
 
 // Endpoint to get a single bill
