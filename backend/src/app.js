@@ -1,4 +1,5 @@
 const { promisify } = require("util");
+require('dotenv').config();
 
 const debug = require('debug')('app');
 const express = require('express');
