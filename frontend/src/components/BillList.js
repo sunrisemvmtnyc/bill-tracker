@@ -12,6 +12,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 import BillListItem from './BillListItem';
+import Search from './Search';
 
 const useStyles = makeStyles({
   header: { color: 'white' },
@@ -24,6 +25,7 @@ const useStyles = makeStyles({
 export default function BillList(props) {
   const c = useStyles();
   const [bills, setBills] = useState([]);
+  const [search, setSearch] = useState('');
   const [currentFilter, setFilter] = useState('SIGNED_BY_GOV')
 
   useEffect(() => {
@@ -42,10 +44,15 @@ export default function BillList(props) {
     }
   });
 
-  // Only keep the completed bills
-  console.log(bills.length);
-
-  let filteredBills = bills.filter(x => x.status.statusType == currentFilter);
+  let filteredBills = bills.filter(x => {
+    return (
+      x.status.statusType === currentFilter && 
+      (
+        x.title.toLowerCase().includes(search.toLowerCase()) ||
+        x.basePrintNo.toLowerCase().includes(search.toLowerCase()) // S11, A29A, etc.
+      )
+    );
+  }).slice(0, 500); // The user does not need to see 23,000 bills
 
   const filterByStatus = (status) => { return () => setFilter(status) };
 
@@ -64,6 +71,7 @@ export default function BillList(props) {
         </Typography>
       </Box>
 
+      <Search setSearchText={setSearch} />
       <Paper className={c.paper}>
         <TableContainer>
           <Table className={c.table} aria-label="simple table">
