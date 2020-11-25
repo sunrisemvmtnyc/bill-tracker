@@ -19,8 +19,14 @@ services:
       shipyard.route: '/api'
     build: 'backend'
     environment:
+      DEBUG: 'app'
       OPEN_LEGISLATION_KEY: ${OPEN_LEGISLATION_KEY}
     volumes:
       - './backend/src:/srv/src'
     ports:
       - '3001:3001'
+
+  redis:
+    image: 'redis:6'
+    ports:
+    - '6379'

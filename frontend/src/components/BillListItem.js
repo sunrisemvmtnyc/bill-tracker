@@ -44,23 +44,24 @@ function stepCompleted(billData, step) {
     'VETOED': ['In Committee', 'On Floor Calendar', 'Passed Senate', 'Passed Assembly', 'Delivered to Governor', 'Vetoed'],
   }[billData.status.statusType] || [];
 
-  console.log('debug', completedSteps.includes(step));
   return completedSteps.includes(step);
 }
 
 export default function BillListItem(props) {
   const c = useStyles();
-  const [billData, setBillData] = useState(null);
 
-  useEffect(() => {
-    if (!billData) {
-      fetch(`/api/v1/bill/${props.year}/${props.bill}`)
-        .then(res => res.json())
-        .then(data => {
-          setBillData(data.result);
-        });
-    }
-  });
+  //const [billData, setBillData] = useState(null);
+
+  //useEffect(() => {
+    //if (!billData) {
+      //fetch(`/api/v1/bills/${props.year}/${props.bill}`)
+        //.then(res => res.json())
+        //.then(data => {
+          //setBillData(data.result);
+        //});
+    //}
+  //});
+  const billData = props.billData;
 
   // Don't render anything if there is no data
   if (billData === null) {
@@ -81,7 +82,7 @@ export default function BillListItem(props) {
 
   return (
     <TableRow key={billData.printNo}>
-      <TableCell component="th" scope="row" colspan={2} align="center" className={c.billName}>
+      <TableCell component="th" scope="row" colSpan={2} align="center" className={c.billName}>
         <Link target="_blank" href={billURL}>
           {fullBillName}
         </Link>
