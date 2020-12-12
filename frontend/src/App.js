@@ -2,7 +2,7 @@ import React from 'react';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 
-import './App.css';
+import './index.css';
 import BillList from './components/BillList';
 
 const BILLS =[

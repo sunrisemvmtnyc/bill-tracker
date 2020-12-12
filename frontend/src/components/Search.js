@@ -1,24 +1,27 @@
 import React, {useState} from 'react';
 
-import TextField from '@material-ui/core/TextField';
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
 
 const Search = (props) => {
   const [search, setSearch] = useState('');
 
   const submit = (e) => {
     e.preventDefault()
+    console.log('submitted')
     props.setSearchText(search)
   }
 
   return (
-    <Box bgcolor="white">
+    <div className="search-bar">
       <form onSubmit={submit}>
-        <TextField label="Search" variant="outlined" value={search} onChange={(e) => setSearch(e.target.value)}/>
-        <Button type="submit" color="Primary">Search</Button>
+        <input
+          type="text"
+          placeholder="Search by bill title or descrition..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <button type="submit" onClick={submit}>Search</button>
       </form>
-    </Box>
+    </div>
   )
 }
 
