@@ -1,29 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
 
 import BillListItem from './BillListItem';
+import Header from './Header';
 import Search from './Search';
+import './BillList.css'
 
-const useStyles = makeStyles({
-  header: { color: 'white' },
-  list: { background: "transparent", },
-  table: { tableLayout: 'fixed' },
-  paper: { width: '90%' },
-  tableHeader: { fontSize: '1.1rem' },
-});
-
-export default function BillList(props) {
-  const c = useStyles();
+export default function BillList() {
   const [bills, setBills] = useState([]);
   const [search, setSearch] = useState('');
   const [currentFilter, setFilter] = useState('SIGNED_BY_GOV')
@@ -46,7 +28,7 @@ export default function BillList(props) {
 
   let filteredBills = bills.filter(x => {
     return (
-      x.status.statusType === currentFilter && 
+      x.status.statusType === currentFilter &&
       (
         x.title.toLowerCase().includes(search.toLowerCase()) ||
         x.basePrintNo.toLowerCase().includes(search.toLowerCase()) // S11, A29A, etc.
@@ -57,46 +39,27 @@ export default function BillList(props) {
   const filterByStatus = (status) => { return () => setFilter(status) };
 
   return (
-    <Box display="flex"
-      flexDirection="column"
-      flexWrap="nowrap"
-      alignItems="center"
-      p={0}
-      bgcolor="background.paper"
-      className={c.list}
-    >
-      <Box padding={3} color="text.primary">
-        <Typography gutterBottom className={c.header} variant="h4">
-          Progress of Police Reform Legislative Package
-        </Typography>
-      </Box>
-
-      <Search setSearchText={setSearch} />
-      <Paper className={c.paper}>
-        <TableContainer>
-          <Table className={c.table} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-              <TableCell align="center" className={c.tableHeader} colSpan={2}></TableCell>
-              <TableCell align="center" className={c.tableHeader}>Introduced</TableCell>
-              <TableCell align="center" className={c.tableHeader} onClick={filterByStatus('IN_SENATE_COMM')}>In Committee</TableCell>
-              <TableCell align="center" className={c.tableHeader} onClick={filterByStatus('SENATE_FLOOR')}>On Floor Calendar</TableCell>
-              <TableCell align="center" className={c.tableHeader} onClick={filterByStatus('PASSED_SENATE')}>Passed Senate</TableCell>
-              <TableCell align="center" className={c.tableHeader} onClick={filterByStatus('PASSED_ASSEMBLY')}>Passed Assembly</TableCell>
-              <TableCell align="center" className={c.tableHeader} onClick={filterByStatus('DELIVERED_TO_GOV')}>Delivered to Governor</TableCell>
-              <TableCell align="center" className={c.tableHeader} onClick={filterByStatus('SIGNED_BY_GOV')}>Signed by Governor</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredBills.map((value, index) => {
-                //return <BillListItem key={index} year={value.billId.session} bill={value.billId.printNo} />;
-                return <BillListItem key={index} billData={value} />;
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
-
-    </Box>
+    <div>
+      <Header></Header>
+      <Search setSearchText={setSearch}/>
+      <section className="content">
+        <div className="table-head">DESCRIPTION</div>
+        <div className="table-head">OVERALL STATUS</div>
+        <div className="table-head">INTRODUCED</div>
+        <div className="table-head" onClick={filterByStatus('IN_SENATE_COMM')}>IN COMMITTEE</div>
+        <div className="table-head" onClick={filterByStatus('SENATE_FLOOR')}>ON FLOOR CALENDAR</div>
+        <div className="table-head pass-two">
+          <p className="header-senate-paragraph" onClick={filterByStatus('PASSED_SENATE')}>PASSED SENATE</p>
+          <p className="header-assembly-paragraph" onClick={filterByStatus('PASSED_ASSEMBLY')}>PASSED ASSEMBLY</p>
+        </div>
+        <div className="table-head" onClick={filterByStatus('DELIVERED_TO_GOV')}>DELIVERED TO GOVERNOR</div>
+        <div className="table-head" onClick={filterByStatus('SIGNED_BY_GOV')}>SIGNED BY GOVERNOR</div>
+      </section>
+      <div className="bill">
+        {filteredBills.map((value, index) => {
+          return <BillListItem key={index} billData={value} />;
+        })}
+      </div>
+    </div>
   );
 }

@@ -1,32 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import React from 'react';
+import Icons from './icons.svg';
 
-import Link from '@material-ui/core/Link';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
+const rowStyle = {
+  display: "grid",
+  gridTemplateColumns: "3fr 1.5fr 1fr 1fr 1fr 1fr 1fr 1fr",
+};
 
-const useStyles = makeStyles({
-  root: {
-    margin: "10px",
-    width: "1000px"
-  },
-
-  none: {},
-  greenBG: {
-    background: 'green',
-    border: '10px solid white',
-    borderRadius: '30px',
-    fontSize: '1rem',
-    color: 'white'
-  },
-
-  media: { height: 140, },
-
-  billName: {
-    fontSize: '1.2rem',
-    width: '100px'
-  }
-});
 
 
 function stepCompleted(billData, step) {
@@ -48,23 +27,10 @@ function stepCompleted(billData, step) {
 }
 
 export default function BillListItem(props) {
-  const c = useStyles();
-
-  //const [billData, setBillData] = useState(null);
-
-  //useEffect(() => {
-    //if (!billData) {
-      //fetch(`/api/v1/bills/${props.year}/${props.bill}`)
-        //.then(res => res.json())
-        //.then(data => {
-          //setBillData(data.result);
-        //});
-    //}
-  //});
   const billData = props.billData;
 
   // Don't render anything if there is no data
-  if (billData === null) {
+  if (billData === null || billData === undefined) {
     return "";
   }
 
@@ -81,23 +47,73 @@ export default function BillListItem(props) {
   const completed = (step) => stepCompleted(billData, step);
 
   return (
-    <TableRow key={billData.printNo}>
-      <TableCell component="th" scope="row" colSpan={2} align="center" className={c.billName}>
-        <Link target="_blank" href={billURL}>
-          {fullBillName}
-        </Link>
-        <br />
-        {billData.title}
-      </TableCell>
-      <TableCell className={c.greenBG}></TableCell>
-      <TableCell className={completed('In Committee') ? c.greenBG : c.none}></TableCell>
-      <TableCell className={completed('On Floor Calendar') ? c.greenBG : c.none}></TableCell>
-      <TableCell className={completed('Passed Senate') ? c.greenBG : c.none}></TableCell>
-      <TableCell className={completed('Passed Assembly') ? c.greenBG : c.none}></TableCell>
-      <TableCell className={completed('Delivered to Governor') ? c.greenBG : c.none}></TableCell>
-      <TableCell className={completed('Signed by Governor') ? c.greenBG : c.none} align="center">
-        {completed('Signed by Governor') ? `SIGNED: ${billData.status.actionDate}` : ''}
-      </TableCell>
-    </TableRow>
+    <div style={rowStyle} className={billData.printNo}>
+      <div className="bill-description">
+        <a target="_blank" rel="noopener noreferrer" href={billURL}><h2>{fullBillName}</h2></a>
+        <p>{billData.title}</p>
+      </div>
+      <div className="overall-status passed">
+        <p>
+        {completed("Signed by Governor")
+          ? `SIGNED: ${billData.status.actionDate}`
+          : ""}
+        </p>
+      </div>
+      <div className="introduced">
+        <svg className="icon status__icon">
+          <use xlinkHref={`${Icons}#icon--yes24`} />
+        </svg>
+      </div>
+      <div className="in-committee">
+        {completed("In Committee") && (
+          <svg className="icon status__icon">
+            <use xlinkHref={`${Icons}#icon--yes24`} />
+          </svg>
+        )}
+      </div>
+      <div className="on-floor">
+        {completed("On Floor Calendar") && (
+          <svg className="icon status__icon">
+            <use xlinkHref={`${Icons}#icon--yes24`} />
+          </svg>
+        )}
+      </div>
+      <div className="pass-two">
+        <div className="pass-senate">
+          {completed("Passed Senate") ? (
+            <svg className="icon status__icon">
+              <use xlinkHref={`${Icons}#icon--yes24`} />
+            </svg>) : (
+            <svg className="icon status_icon">
+              <use xlinkHref={`${Icons}#icon--blank24`} />
+            </svg>
+          )}
+        </div>
+        <div className="pass-assembly">
+          {completed("Passed Assembly") ? (
+            <svg className="icon status__icon">
+              <use xlinkHref={`${Icons}#icon--yes24`} />
+            </svg>) : (
+            <svg className="icon status_icon">
+              <use xlinkHref={`${Icons}#icon--blank24`} />
+            </svg>
+          )}
+        </div>
+      </div>
+      <div className="deliver-gov">
+        {completed("Delivered to Governor") && (
+          <svg className="icon status__icon">
+            <use xlinkHref={`${Icons}#icon--yes24`} />
+          </svg>
+        )}
+      </div>
+      <div className="sign-gov">
+        {completed("Signed by Governor") && (
+          <svg className="icon status__icon">
+            <use xlinkHref={`${Icons}#icon--yes24`} />
+          </svg>
+        )}
+      </div>
+    </div>
   );
 }
