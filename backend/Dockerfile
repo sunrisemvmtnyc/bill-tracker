@@ -9,4 +9,4 @@ RUN npm install
 # Add the source
 ADD . ./
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
