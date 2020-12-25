@@ -32,8 +32,7 @@ const requestBillsFromAPI = async(year) => {
     let firstResponseData = await firstResponse.json();
 
   if (!firstResponseData.success) {
-    console.error('Did not successfully retrieve bills from legislation.nysenate.gov');
-    return [];
+    throw('Did not successfully retrieve bills from legislation.nysenate.gov. Response from API was marked as a failure.');
   }
 
     // Retrieve the remaining pages
