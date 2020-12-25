@@ -14,7 +14,7 @@ const app = express();
 // Create redis client
 const redisClient = redis.createClient('redis://redis')
 const redisGet = promisify(redisClient.get).bind(redisClient);
-const redisSetEx = promisify(redisClient.setex).bind(redisClient);
+const redisSet = promisify(redisClient.set).bind(redisClient);
 
 // Global constants
 const REDIS_CACHE_TIME = 60 * 60 * 6; // seconds
@@ -37,15 +37,13 @@ const requestBillsFromAPI = async(year) => {
 
     // Retrieve the remaining pages
   let allBills = firstResponseData.result.items;
-    const totalPages = Math.ceil(firstResponseData.total / 1000);
-    for (let i = 1; i < totalPages; i++) {
-      let offsetStart = (i * 1000) + 1;
-      let nextResponse = await fetch(legAPI(`/api/3/bills/${year}`, offsetStart));
-      let nextResponseData = await nextResponse.json();
-      allBills = allBills.concat(nextResponseData.result.items);
-    }
-  // Cache the result for REDIS_CACHE_TIME seconds
-  await redisSetEx(year, REDIS_CACHE_TIME, JSON.stringify(allBills));
+  const totalPages = Math.ceil(firstResponseData.total / 1000);
+  for (let i = 1; i < totalPages; i++) {
+    let offsetStart = (i * 1000) + 1;
+    let nextResponse = await fetch(legAPI(`/api/3/bills/${year}`, offsetStart));
+    let nextResponseData = await nextResponse.json();
+    allBills = allBills.concat(nextResponseData.result.items);
+  }
   return allBills;
 };
 
@@ -82,18 +80,20 @@ const resetCache = async() => {
   let nextCacheResetTime = REDIS_CACHE_TIME * 1000; // JS expects ms
   for (let i = 0; i < years.length; i++) {
     const year = years[i];
-    console.log(`fetching bills for year ${year}`);
+    console.log(`Making automatic request for bills of year ${year}`);
     try {
-      await requestBillsFromAPI(year); // this repopulates the cache
+      let bills = await requestBillsFromAPI(year);
+      console.log(`Successful automatic request for bills of year ${year}`);
+      redisSet(year, JSON.stringify(bills));
     } catch (error) {
-      console.error(`Error fetching bills for year ${year}`);
+      console.error(`Error automatically requesting bills for year ${year}`);
       console.error(error);
       // If it failed, try again in a few minutes.
       nextCacheResetTime = 600 * 1000;
       break;
     }
   }
-  
+
   // reset cache again in a set amount of time
   setTimeout(resetCache, nextCacheResetTime);
 };
