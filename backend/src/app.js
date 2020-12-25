@@ -95,7 +95,7 @@ const resetCache = async() => {
   }
   
   // reset cache again in a set amount of time
-  setInterval(resetCache, REDIS_CACHE_TIME * 1000);
+  setTimeout(resetCache, REDIS_CACHE_TIME * 1000);
 };
 
 // Listen
