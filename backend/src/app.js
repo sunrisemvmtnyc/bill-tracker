@@ -17,7 +17,7 @@ const redisGet = promisify(redisClient.get).bind(redisClient);
 const redisSetEx = promisify(redisClient.setex).bind(redisClient);
 
 // Global constants
-const REDIS_CACHE_TIME = 600; // NOTE: redis counts seconds, NOT milliseconds
+const REDIS_CACHE_TIME = 60 * 60 * 6; // seconds
 const BILL_PAGE_SIZE = 3000;
 
 // Format the URL with the key and given offset
