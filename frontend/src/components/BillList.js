@@ -11,8 +11,6 @@ export default function BillList() {
   const [currentFilter, setFilter] = useState('SIGNED_BY_GOV')
 
   useEffect(() => {
-    if (bills.length === 0) {
-
       const paginateBills = async() => {
         let start = 0
         do {
@@ -23,8 +21,7 @@ export default function BillList() {
         } while (start > 0)
       }
       paginateBills()
-    }
-  });
+  }, []); // Only run on initial page load
 
   let filteredBills = bills.filter(x => {
     return (
