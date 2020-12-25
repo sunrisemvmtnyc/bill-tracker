@@ -52,10 +52,7 @@ const requestBillsFromAPI = async(year) => {
 const getBillsWithCache = async(year) => {
   const cachedBills = await redisGet(year);
   if (cachedBills && cachedBills.length > 0) return JSON.parse(cachedBills);
-
-  console.log('resetting cache manually');
-  let allBills = await requestBillsFromAPI(year);
-  return allBills;
+  else return [];
 };
 
 // Endpoint to get all the bills in a year
