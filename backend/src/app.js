@@ -14,10 +14,10 @@ const app = express();
 // Create redis client
 const redisClient = redis.createClient('redis://redis')
 const redisGet = promisify(redisClient.get).bind(redisClient);
-const redisSetEx = promisify(redisClient.setex).bind(redisClient);
+const redisSet = promisify(redisClient.set).bind(redisClient);
 
 // Global constants
-const REDIS_CACHE_TIME = 600; // NOTE: redis counts seconds, NOT milliseconds
+const REDIS_CACHE_TIME = 60 * 60 * 6; // seconds
 const BILL_PAGE_SIZE = 3000;
 
 // Format the URL with the key and given offset
@@ -32,31 +32,25 @@ const requestBillsFromAPI = async(year) => {
     let firstResponseData = await firstResponse.json();
 
   if (!firstResponseData.success) {
-    console.error('Did not successfully retrieve bills from legislation.nysenate.gov');
-    return [];
+    throw('Did not successfully retrieve bills from legislation.nysenate.gov. Response from API was marked as a failure.');
   }
 
     // Retrieve the remaining pages
   let allBills = firstResponseData.result.items;
-    const totalPages = Math.ceil(firstResponseData.total / 1000);
-    for (let i = 1; i < totalPages; i++) {
-      let offsetStart = (i * 1000) + 1;
-      let nextResponse = await fetch(legAPI(`/api/3/bills/${year}`, offsetStart));
-      let nextResponseData = await nextResponse.json();
-      allBills = allBills.concat(nextResponseData.result.items);
-    }
-  // Cache the result for REDIS_CACHE_TIME seconds
-  await redisSetEx(year, REDIS_CACHE_TIME, JSON.stringify(allBills));
+  const totalPages = Math.ceil(firstResponseData.total / 1000);
+  for (let i = 1; i < totalPages; i++) {
+    let offsetStart = (i * 1000) + 1;
+    let nextResponse = await fetch(legAPI(`/api/3/bills/${year}`, offsetStart));
+    let nextResponseData = await nextResponse.json();
+    allBills = allBills.concat(nextResponseData.result.items);
+  }
   return allBills;
 };
 
 const getBillsWithCache = async(year) => {
   const cachedBills = await redisGet(year);
   if (cachedBills && cachedBills.length > 0) return JSON.parse(cachedBills);
-
-  console.log('resetting cache manually');
-  let allBills = await requestBillsFromAPI(year);
-  return allBills;
+  else return [];
 };
 
 // Endpoint to get all the bills in a year
@@ -83,19 +77,25 @@ app.get('/api/v1/bills/:year/:printNumber', async (req, res) => {
 const resetCache = async() => {
   console.log('resetting cache automatically');
   const years = [2019, 2020];
+  let nextCacheResetTime = REDIS_CACHE_TIME * 1000; // JS expects ms
   for (let i = 0; i < years.length; i++) {
     const year = years[i];
-    console.log(`fetching bills for year ${year}`);
+    console.log(`Making automatic request for bills of year ${year}`);
     try {
-      await requestBillsFromAPI(year); // this repopulates the cache
+      let bills = await requestBillsFromAPI(year);
+      console.log(`Successful automatic request for bills of year ${year}`);
+      redisSet(year, JSON.stringify(bills));
     } catch (error) {
-      console.error(`Error fetching bills for year ${year}`);
+      console.error(`Error automatically requesting bills for year ${year}`);
       console.error(error);
+      // If it failed, try again in a few minutes.
+      nextCacheResetTime = 600 * 1000;
+      break;
     }
   }
-  
+
   // reset cache again in a set amount of time
-  setInterval(resetCache, REDIS_CACHE_TIME * 1000);
+  setTimeout(resetCache, nextCacheResetTime);
 };
 
 // Listen

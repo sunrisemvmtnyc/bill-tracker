@@ -5,7 +5,7 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js --unhandled-rejections=strict"
+    "dev": "nodemon --unhandled-rejections=strict src/app.js"
   },
   "author": "",
   "license": "MIT",
