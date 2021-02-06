@@ -14,18 +14,6 @@ const Header = () => {
             New York State Bill Tracker for Police Reform
           </h1>
         </div>
-        <div className="site-header__slogan">
-          <p>
-            Easily track the progress of NY State legistation package for police
-            reform.
-          </p>
-        </div>
-        <a className="site-header__contact" href="mailto:team@astoria.digital">
-          <svg className="icon callout__icon">
-            <use xlinkHref={`${Icons}#icon--email`}/>
-          </svg>
-          <span className="callout__text">Contact Us</span>
-        </a>
       </section>
     );
 }
