@@ -2,14 +2,12 @@
   display: flex;
   flex-flow: row nowrap;
   padding: 2ch;
-  border-top: 3px solid #000;
-  border-bottom: 3px solid #000;
 }
 
 .search-bar input {
   flex-grow: 1;
   padding: 1ch;
-  border-width: 0;
+  border-width: 1px;
   border-color: #000;
 }
 
