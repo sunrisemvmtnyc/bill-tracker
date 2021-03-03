@@ -1,4 +1,8 @@
 import React from 'react';
+import Select from 'react-select';
+
+import ChevronDown from './chevron-down';
+
 
 const committees = [
   "Administrative Regulations Review Commission (ARRC)",
@@ -51,10 +55,24 @@ const committees = [
 
 const CommitteeDropdown = ({committee, setCommittee}) => {
   return (
-    <select className="search-select" value={committee} onChange={(e) => setCommittee(e.target.value)}>
-      <option value="">All committees</option>
-      {committees.map(c => <option key={c} value={c}>{c}</option>)}
-    </select>
+    <Select
+      onChange={(option) => setCommittee(option.value)}
+      options={committees.map(c => ({value: c, label: c}))}
+      placeholder="Filter bills by committee"
+      // menuIsOpen={true} // useful for debugging
+      styles={{
+        container: (base) => ({...base, flex: "1 1 auto", maxWidth: "40%"}),
+        control: (base) => ({...base, border: "3px solid #000", borderRadius: 0, height: "5rem"}),
+        menu: (base) => ({...base, margin: 0}),
+        menuList: (base) => ({...base, scrollbarWidth: "none", borderRight: "3px solid #000", borderBottom: "3px solid #000", borderLeft: "3px solid #000", borderRadius: 0}),
+      }}
+      components={{
+        DropdownIndicator: ({ innerRef }) => (
+          <ChevronDown ref={innerRef} style={{fill: "none"}} size={30}/>
+        ),
+        IndicatorSeparator: ({ innerRef }) => <div className="custom-sep" ref={innerRef}></div>,
+      }}
+    />
   )
 }
 export default CommitteeDropdown;
