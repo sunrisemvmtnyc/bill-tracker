@@ -6,20 +6,17 @@
   margin-right: 2ch;
 }
 
-.site-header__title,
-.site-header__slogan {
+.site-header__title{
   display: flex;
   flex-flow: row nowrap;
   justify-content: center;
   align-items: center;
   padding: 1em;
-}
-
-.site-header__title {
   color: #fff;
   font-weight: 500;
   margin: 0;
   background-color: var(--highlight-blue);
+  flex-grow: 1;
 }
 
 .site-header__contact {

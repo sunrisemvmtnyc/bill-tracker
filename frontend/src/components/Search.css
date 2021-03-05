@@ -2,21 +2,21 @@
   display: flex;
   flex-flow: row nowrap;
   padding: 2ch;
-  border-top: 3px solid #000;
-  border-bottom: 3px solid #000;
 }
 
 .search-bar input {
   flex-grow: 1;
   padding: 1ch;
-  border-width: 0;
-  border-color: #000;
+  border: 3px solid #000;
+  border-radius: 0;
+  height: 5rem;
 }
 
 .search-bar button {
   border: 1px solid #000;
   background-color: #fff;
   color: #000;
+  height: 5rem;
 }
 
 .search-bar button:hover {

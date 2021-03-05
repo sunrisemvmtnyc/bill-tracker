@@ -14,17 +14,6 @@ const Header = () => {
             New York State Bill Tracker
           </h1>
         </div>
-        <div className="site-header__slogan">
-          <p>
-            Easily track the progress of New York State legistation packages.
-          </p>
-        </div>
-        <a className="site-header__contact" href="mailto:team@astoria.digital">
-          <svg className="icon callout__icon">
-            <use xlinkHref={`${Icons}#icon--email`}/>
-          </svg>
-          <span className="callout__text">Contact Us</span>
-        </a>
       </section>
     );
 }
