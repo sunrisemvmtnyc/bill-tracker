@@ -28,7 +28,7 @@ function legAPI(path, offset = '0') {
 const requestBillsFromAPI = async(year) => {
 
     // First request with no offset
-  let firstResponse = await fetch(legAPI(`/api/3/bills/${year}`));
+  let firstResponse = await fetch(legAPI(`api/3/bills/${year}`));
     let firstResponseData = await firstResponse.json();
 
   if (!firstResponseData.success) {
@@ -76,15 +76,17 @@ app.get('/api/v1/bills/:year/:printNumber', async (req, res) => {
 
 const resetCache = async() => {
   console.log('resetting cache automatically');
-  const years = [2020, 2021];
+  const years = [2023];
   let nextCacheResetTime = REDIS_CACHE_TIME * 1000; // JS expects ms
   for (let i = 0; i < years.length; i++) {
     const year = years[i];
     console.log(`Making automatic request for bills of year ${year}`);
     try {
       let bills = await requestBillsFromAPI(year);
-      console.log(`Successful automatic request for bills of year ${year}`);
+      // console.log(JSON.stringify(bills));
       redisSet(year, JSON.stringify(bills));
+      console.log(`Successful automatic request for bills of year ${year}`);
+      console.log(`Fetched ${bills.length} bills`);
     } catch (error) {
       console.error(`Error automatically requesting bills for year ${year}`);
       console.error(error);
